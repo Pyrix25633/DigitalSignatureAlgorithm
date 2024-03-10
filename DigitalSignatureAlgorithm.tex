@@ -1,0 +1,151 @@
+\documentclass[14pt]{extarticle}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\tolerance 1
+\emergencystretch \maxdimen
+\hyphenpenalty 10000
+\hbadness 10000
+\setlength{\parindent}{0pt}
+
+\title{Digital Signature Algorithm}
+\date{2024-03-09}
+\author{Mattia Biral}
+% Remove for printing
+\definecolor{text}{HTML}{EEEEEE}
+\definecolor{page}{HTML}{222222}
+\color{text}
+\pagecolor{page}
+% End remove for printing
+
+\begin{document}
+    \pagenumbering{gobble}
+    \maketitle
+    \newpage
+    \pagenumbering{arabic}
+    \sffamily
+
+    \section{Introduzione}
+
+    Il \textbf{Digital Signature Algorithm} è un sistema crittografico a chiave pubblica e uno \emph{standard federale per l'elaborazione delle informazioni} per le \textbf{firme digitali}.
+    
+    La chiave privata è utilizzata per generare la firma, mentre la chiave pubblica per verificarla.
+
+    E' basato sul problema matematico del \underline{logaritmo discreto}.
+
+    \subsection{Firma digitale}
+
+    La firma digitale fornisce:
+    \begin{itemize}
+        \item Autenticazione: so chi ha inviato il messaggio
+        \item Integrità: so che il documento non è stato modificato dopo la firma
+        \item Non-ripudio: l'autore non può dire di non essere stato lui a firmare (side-effect dell'autenticazione)
+    \end{itemize}
+
+    \subsection{Operazioni}
+
+    DSA si svolge in quattro operazioni:
+    \begin{itemize}
+        \item Generazione delle chiavi
+        \item Distribuzione delle chiavi
+        \item Firma
+        \item Verifica della firma
+    \end{itemize}
+
+    \section{Algoritmo}
+
+    \subsection{Generazione delle chiavi}
+
+    \subsubsection{Parametri}
+
+    I parametri dell'algoritmo sono $(p, q, g)$
+
+    \begin{itemize}
+        \item $H$ funzione crittografica di hash di lunghezza $|H|$ bit (se $|H|$ è maggiore della lunghezza del modulo $N$ solo gli $N$ bit più significativi dell'output saranno utilizzati)
+        \item $L$ lunghezza della chiave
+        \item $N$ lunghezza del modulo tale che $N < L \wedge N <= |H| $
+        \item $q$ primo di $N$ bit
+        \item $p$ primo di $L$ bit tale che $q \mid p-1$
+        \item $h$ casuale in $\{2, ..., p-2\}$
+        \item $g := h^{{p-1}/q} \mod p$ (se $g=1$ è necessario generare un nuovo $h$)
+    \end{itemize}
+
+    \subsubsection{Chiavi per-user}
+
+    \begin{itemize}
+        \item $x$ casuale in $\{1, ..., q-1\}$, \textbf{chiave privata}
+        \item $y := g^x \mod p$, \textbf{chiave pubblica}
+    \end{itemize}
+
+    \subsection{Distribuzione delle chiavi}
+
+    Il firmatario pubblica la chiave \emph{pubblica} $y$ e mantiene segreta $x$
+
+    \subsection{Firma}
+
+    Un messaggio $m$ è firmato come segue:
+    \begin{itemize}
+        \item $k$ casuale in $\{1, ..., q-1\}$
+        \item $r := (g^k \mod p) \mod q$ (se $r = 0$ è necessario generare un nuovo $k$)
+        \item $s := (k^{-1}(H(m) + xr)) \mod q$ (se $s = 0$ è necessario scegliere un'altro $k$)
+    \end{itemize}
+    La firma è $(r, s)$
+
+    \bigskip
+    Nota: dato che ogni volta che si firma il messaggio viene scelto un $k$ casuale, è molto probabile che più firme di uno stesso documento siano \textbf{diverse ma ugualmente valide}.
+
+    \bigskip
+    Nota: la computazione più costosa riguarda $r$, ma può essere fatta prima di conoscere $m$ poiché non dipende da esso.
+
+    \bigskip
+    Nota: la seconda computazione più costosa riguarda $k^{-1}$, ma anch'essa può essere effettuata prima che $m$ sia noto.
+
+    \subsection{Verifica della firma}
+
+    Si verifica che una firma è autentica come segue:
+    \begin{itemize}
+        \item $0 < r < q \wedge 0 < s < q$ (in quanto risultati di $... \mod q$)
+        \item $w := s^{-1} \mod q$
+        \item $u_1 := H(m) \cdot w \mod q$
+        \item $u_2 := r \cdot w \mod q$
+        \item $v := (g^{u_1}y^{u_2} \mod p) \mod q$
+        \item $v = r$
+    \end{itemize}
+
+    \section{Correttezza dell'algoritmo}
+
+    Lo schema di firma è corretto nel senso che il verificatore accetterà sempre firme autentiche.
+
+    \bigskip
+    Dato che
+    
+    \begin{equation*}
+        g = h^{(p-1)/q} \mod p
+        =>
+        g^q \equiv h^{p-1} \equiv 1 \mod p
+    \end{equation*}
+    poiché $g > 0$ e $g$ è primo, $g$ ha ordine $q$.
+
+    \bigskip
+    Il firmatario calcola
+    \begin{equation*}
+        s = k^{-1}(H(m) + xr) \mod p
+    \end{equation*}
+    Quindi
+    \begin{align*}
+        k &\equiv H(m)s^{-1} + xrs^{-1}\\
+          &\equiv H(m)w + xrw \mod q
+    \end{align*}
+    Dal momento che $g$ ha ordine $q$ abbiamo
+    \begin{align*}
+        g^k &\equiv g^{H(m)w}g^{xrw}\\
+            &\equiv g^{H(m)w}y^{rw}\\
+            &\equiv g^{u_1}y^{u_2} \mod p
+    \end{align*}
+    Infine
+    \begin{align*}
+        r &= (g^k \mod p) \mod q\\
+          &= (g^{u_1}y^{u_2} \mod p) \mod q\\
+          &= v
+    \end{align*}
+
+\end{document}
