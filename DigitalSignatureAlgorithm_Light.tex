@@ -56,7 +56,7 @@
     \begin{itemize}
         \item $H$ funzione crittografica di hash di lunghezza $|H|$ bit (se $|H|$ è maggiore della lunghezza del modulo $N$ solo gli $N$ bit più significativi dell'output saranno utilizzati)
         \item $L$ lunghezza della chiave
-        \item $N$ lunghezza del modulo tale che $N < L \wedge N <= |H| $
+        \item $N$ lunghezza del modulo tale che $N < L \wedge N \leq  |H| $
         \item $q$ primo di $N$ bit
         \item $p$ primo di $L$ bit tale che $q \mid p-1$
         \item $h$ casuale in $\{2, ..., p-2\}$
@@ -114,7 +114,7 @@
     
     \begin{equation*}
         g = h^{(p-1)/q} \mod p
-        =>
+        \implies
         g^q \equiv h^{p-1} \equiv 1 \mod p
     \end{equation*}
     poiché $g > 0$ e $g$ è primo, $g$ ha ordine $q$.

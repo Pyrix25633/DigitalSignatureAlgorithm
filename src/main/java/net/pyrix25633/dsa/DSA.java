@@ -18,8 +18,8 @@ public class DSA {
     public DSA() {
         this.random = new Random();
 
-        this.L = 14;
-        this.N = 10;
+        this.L = 28;
+        this.N = 24;
         this.q = new PrimeGenerator(N).get();
         this.p = generateP();
         GH gh = generateGH();
@@ -66,7 +66,7 @@ public class DSA {
         do {
             k = random.nextInt(1, q);
             r = power(g, k, p) % q;
-            s = (inverse(k, q) * ((H(m) + ((keys.x*r) % q)) % q)) % q;
+            s = multiply(inverse(k, q), (H(m) + multiply(keys.x, r, q)), q);
         } while(r <= 0 || s <= 0);
         return new Signature(keys.owner, r, s);
     }
@@ -75,9 +75,9 @@ public class DSA {
         if(signature.r <= 0 || signature.r >= q) return false;
         if(signature.s <= 0 || signature.s >= q) return false;
         int w = inverse(signature.s, q);
-        int u1 = (int)((long)H(m)*w) % q;
-        int u2 = (int)((long)signature.r*w) % q;
-        int v = (int)(((long)power(g, u1, p)*power(keys.y, u2, p)) % p) % q;
+        int u1 = multiply(H(m), w, q);
+        int u2 = multiply(signature.r, w, q);
+        int v = multiply(power(g, u1, p), power(keys.y, u2, p), p) % q;
         return v == signature.r;
     }
 
@@ -91,19 +91,24 @@ public class DSA {
                 "\ng: " + g;
     }
 
+    public static int multiply(int n, int t, int m) {
+        n = n % m;
+        t = t % m;
+        return (int)(((long)n*t) % m);
+    }
+
     public static int power(int b, int e, int m) {
         b = b % m;
         e = e % (m-1);
         int r = 1;
-        for(int i = 0; i < e; i++) {
-            r = (r*b) % m;
-        }
+        for(int i = 0; i < e; i++)
+            r = multiply(r, b, m);
         return (r+m) % m;
     }
 
     public static int inverse(int n, int m) {
         for(int i = 1; i < m; i++) {
-            if((((long)i*n) % m) == 1)
+            if(multiply(i, n, m) == 1)
                 return i;
         }
         throw new IllegalStateException("No inverse of " + n + " mod " + m);
