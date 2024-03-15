@@ -107,11 +107,7 @@ public class DSA {
     }
 
     public static int inverse(int n, int m) {
-        for(int i = 1; i < m; i++) {
-            if(multiply(i, n, m) == 1)
-                return i;
-        }
-        throw new IllegalStateException("No inverse of " + n + " mod " + m);
+        return power(n, m-2, m);
     }
 
     @SuppressWarnings("ClassCanBeRecord")

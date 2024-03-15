@@ -79,7 +79,7 @@
     Un messaggio $m$ è firmato come segue:
     \begin{itemize}
         \item $k$ casuale in $\{1, ..., q-1\}$
-        \item $r := (g^k \mod p) \mod q$ (se $r = 0$ è necessario generare un nuovo $k$)
+        \item $r := (g^k \mod p) \mod q = g^k \mod pq$ (se $r = 0$ è necessario generare un nuovo $k$)
         \item $s := (k^{-1}(H(m) + xr)) \mod q$ (se $s = 0$ è necessario scegliere un'altro $k$)
     \end{itemize}
     La firma è $(r, s)$
@@ -117,7 +117,8 @@
         \implies
         g^q \equiv h^{p-1} \equiv 1 \mod p
     \end{equation*}
-    poiché $g > 0$ e $g$ è primo, $g$ ha ordine $q$.
+    per il teorema di Eulero.
+    Poiché $g > 0$ e $g$ è primo, $g$ ha ordine $q$.
 
     \bigskip
     Il firmatario calcola

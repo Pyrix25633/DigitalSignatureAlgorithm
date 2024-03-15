@@ -1,0 +1,65 @@
+\documentclass[14pt]{extarticle}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{bbm}
+\tolerance 1
+\emergencystretch \maxdimen
+\hyphenpenalty 10000
+\hbadness 10000
+\setlength{\parindent}{0pt}
+
+\title{Digital Signature Algorithm}
+\date{2024-03-09}
+\author{Mattia Biral}
+
+\begin{document}
+    \pagenumbering{gobble}
+    \maketitle
+    \newpage
+    \pagenumbering{arabic}
+    \sffamily
+
+    \section{Introduzione}
+
+    Il \textbf{Digital Signature Algorithm} è un sistema crittografico a chiave pubblica e uno \emph{standard federale per l'elaborazione delle informazioni}
+    La chiave privata è utilizzata per generare la firma, mentre la chiave pubblica per verificarla.
+
+    E' basato sul problema matematico del \underline{logaritmo discreto}.
+
+    \subsection{Firma digitale}
+
+    La firma digitale fornisce:
+    \begin{itemize}
+        \item Autenticazione: so chi ha inviato il messaggio
+        \item Integrità: so che il documento non è stato modificato dopo la firma
+        \item Non-ripudio: l'autore non può dire di non essere stato lui a firmare (side-effect dell'autenticazione)
+    \end{itemize}
+
+    \subsection{Operazioni}
+
+    DSA si svolge in quattro operazioni:
+    \begin{itemize}
+        \item Generazione delle chiavi
+        \item Distribuzione delle chiavi
+        \item Firma
+        \item Verifica della firma
+    \end{itemize}
+
+    \section{Algoritmo}
+
+    \subsection{Generazione delle chiavi}
+
+    \subsubsection{Parametri}
+
+    I parametri dell'algoritmo sono $(p, q, g)$
+
+    \begin{itemize}
+        \item $H$ funzione crittografica di hash di lunghezza $|H|$ bit (se $|H|$ è maggiore della lunghezza del modulo $N$ solo gli $N$ bit più significativi dell'output saranno utilizzati)
+        \item $L$ lunghezza della chiave
+        \item $N$ lunghezza del modulo tale che $N < L \wedge N \leq  |H| $
+        \item $q$ primo di $N$ bit
+        \item $p$ primo di $L$ bit tale che $q \mid p-1$
+        \item $h$ casuale in $\{2, ..., p-2\} = \mathbb{F}_p^* - \{1, p - 1\}$
+        \item $g := h^{{p-1}/q} \mod p$ (se $g=1$ è necessario generare un nuovo $h$)
+    \end{itemize}
+\end{document}
